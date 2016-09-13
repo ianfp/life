@@ -36,8 +36,8 @@ func main() {
 	}
 	fmt.Printf("Board size is %d.\n", boardSize)
 	board := makeBoard(boardSize)
-	populateRandomly(board)
-	runBoard(board, iterations)
+	board.populateRandomly()
+	board.run(iterations)
 }
 
 func makeBoard(size int) board {
@@ -48,7 +48,7 @@ func makeBoard(size int) board {
 	return b
 }
 
-func populateRandomly(b board) {
+func (b board) populateRandomly() {
 	rand.Seed(int64(os.Getpid()))
 	for i, row := range b {
 		for j := range row {
@@ -59,11 +59,11 @@ func populateRandomly(b board) {
 	}
 }
 
-func runBoard(b board, iterations int) {
+func (b board) run(iterations int) {
 	printBoard(b)
 	for round := 0; round < iterations; round ++ {
 		time.Sleep(sleepTime)
-		b = updateBoard(b)
+		b = b.update()
 		printBoard(b)
 	}
 }
@@ -82,25 +82,25 @@ func printBoard(b board) {
 	fmt.Print("\n")
 }
 
-func updateBoard(b board) board {
+func (b board) update() board {
 	newBoard := makeBoard(len(b))
 	for rNum, row := range b {
 		for cNum := range row {
 			currentState := row[cNum]
-			count := countNeighbors(b, rNum, cNum)
+			count := b.countNeighbors(rNum, cNum)
 			newBoard[rNum][cNum] = determineState(currentState, count)
 		}
 	}
 	return newBoard
 }
 
-func countNeighbors(b board, rNum int, cNum int) (count uint) {
+func (b board) countNeighbors(rNum int, cNum int) (count uint) {
 	for r := -1; r <= 1; r++ {
 		for c := -1; c <= 1; c++ {
 			if r == 0 && c == 0 {
 				continue // don't count yourself
 			}
-			if isAlive(b, rNum+r, cNum+c) {
+			if b.isAlive(rNum+r, cNum+c) {
 				count++
 			}
 		}
@@ -108,7 +108,7 @@ func countNeighbors(b board, rNum int, cNum int) (count uint) {
 	return
 }
 
-func isAlive(b board, rNum int, cNum int) bool {
+func (b board) isAlive(rNum int, cNum int) bool {
 	if rNum < 0 || rNum >= len(b) {
 		return false
 	}
