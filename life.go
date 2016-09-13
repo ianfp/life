@@ -18,7 +18,7 @@ const sleepTime = 200 * time.Millisecond
 type board [][]bool
 
 func main() {
-	if len(os.Args) == 2 {
+	if len(os.Args) != 3 {
 		fmt.Println("Usage: life BOARD_SIZE ITERATIONS")
 		return
 	}
