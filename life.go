@@ -9,9 +9,11 @@ import (
 )
 
 const probAlive = 5
-const surviveMin = 2
-const surviveMax = 3
-const reproduceAt = 3
+const (
+	surviveMin = 2
+	surviveMax = 3
+	reproduceAt = 3
+)
 
 const sleepTime = 200 * time.Millisecond
 
