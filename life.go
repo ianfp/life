@@ -1,3 +1,4 @@
+// A Go implementation of Conway's Game of Life.
 package main
 
 import (
@@ -8,15 +9,21 @@ import (
 	"time"
 )
 
+// The chance that a given cell start the game "alive" is 1 / `probAlive`.
 const probAlive = 5
 const (
+	// The minimum number of neighbors required to survive a round.
 	surviveMin = 2
+	// The maximum number of neighbors with which a cell will survive a round.
 	surviveMax = 3
+	// The number of neighbors a dead cell needs in order to come to life.
 	reproduceAt = 3
 )
 
+// How long to sleep between rounds
 const sleepTime = 200 * time.Millisecond
 
+// The game board: true means alive, false means dead.
 type board [][]bool
 
 func main() {
@@ -40,6 +47,7 @@ func main() {
 	board.run(iterations)
 }
 
+// Make a new game board.
 func makeBoard(size int) board {
 	b := make(board, size)
 	for i := range b {
@@ -48,6 +56,7 @@ func makeBoard(size int) board {
 	return b
 }
 
+// Populate a new game board randomly, according to the `probAlive` setting.
 func (b board) populateRandomly() {
 	rand.Seed(int64(os.Getpid()))
 	for i, row := range b {
@@ -59,6 +68,7 @@ func (b board) populateRandomly() {
 	}
 }
 
+// Run the game.
 func (b board) run(iterations int) {
 	printBoard(b)
 	for round := 0; round < iterations; round ++ {
@@ -68,6 +78,7 @@ func (b board) run(iterations int) {
 	}
 }
 
+// Print the current state of the board to STDOUT.
 func printBoard(b board) {
 	for _, row := range b {
 		for _, state := range row {
@@ -82,6 +93,7 @@ func printBoard(b board) {
 	fmt.Print("\n")
 }
 
+// Returns a new board that represents the state of the game on the next round.
 func (b board) update() board {
 	newBoard := makeBoard(len(b))
 	for rNum, row := range b {
@@ -94,6 +106,7 @@ func (b board) update() board {
 	return newBoard
 }
 
+// Returns the number of "alive" neighbors a given cell has.
 func (b board) countNeighbors(rNum int, cNum int) (count uint) {
 	for r := -1; r <= 1; r++ {
 		for c := -1; c <= 1; c++ {
@@ -108,6 +121,7 @@ func (b board) countNeighbors(rNum int, cNum int) (count uint) {
 	return
 }
 
+// Whether a cell is alive in the current state of the board.
 func (b board) isAlive(rNum int, cNum int) bool {
 	if rNum < 0 || rNum >= len(b) {
 		return false
@@ -118,6 +132,8 @@ func (b board) isAlive(rNum int, cNum int) bool {
 	return b[rNum][cNum]
 }
 
+// Given the state a cell and the number of living neighbors,
+// return whether it survives the current round.
 func determineState(current bool, count uint) bool {
 	return (count == reproduceAt) || (current && count >= surviveMin && count <= surviveMax)
 }
