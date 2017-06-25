@@ -78,7 +78,7 @@ func (b board) populateRandomly() {
 // Run the game.
 func (b board) run(iterations int) {
 	printBoard(b)
-	for round := 0; round < iterations; round ++ {
+	for round := 0; round < iterations; round++ {
 		time.Sleep(sleepTime)
 		b = b.update()
 		printBoard(b)
