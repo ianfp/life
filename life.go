@@ -9,18 +9,25 @@ import (
 	"time"
 )
 
-// The chance that a given cell start the game "alive" is 1 / `probAlive`.
+const (
+	// The first argument is the size of the board.
+	argBoardSize = 1
+	// The second argument is the number of rounds to play the game.
+	argIterations = 2
+)
+
+// The chance that a given cell starts the game alive is 1 / `probAlive`.
 const probAlive = 5
 const (
-	// The minimum number of neighbors required to survive a round.
+	// Fewer neighbors than this and a cell dies of lonliness.
 	surviveMin = 2
-	// The maximum number of neighbors with which a cell will survive a round.
+	// More neighbors than this and a cell dies of overcrowding.
 	surviveMax = 3
-	// The number of neighbors a dead cell needs in order to come to life.
+	// If a dead cell has this many living neighbors, it comes back to life.
 	reproduceAt = 3
 )
 
-// How long to sleep between rounds
+// How long to sleep between rounds.
 const sleepTime = 200 * time.Millisecond
 
 // The game board: true means alive, false means dead.
@@ -31,14 +38,14 @@ func main() {
 		fmt.Println("Usage: life BOARD_SIZE ITERATIONS")
 		return
 	}
-	boardSize, err := strconv.Atoi(os.Args[1])
+	boardSize, err := strconv.Atoi(os.Args[argBoardSize])
 	if err != nil {
-		fmt.Printf("Invalid size %s.\n", os.Args[1])
+		fmt.Printf("Invalid size %s.\n", os.Args[argBoardSize])
 		return
 	}
-	iterations, err := strconv.Atoi(os.Args[2])
+	iterations, err := strconv.Atoi(os.Args[argIterations])
 	if err != nil {
-		fmt.Printf("Invalid iterations %s.\n", os.Args[2])
+		fmt.Printf("Invalid iterations %s.\n", os.Args[argIterations])
 		return
 	}
 	fmt.Printf("Board size is %d.\n", boardSize)
@@ -56,7 +63,7 @@ func makeBoard(size int) board {
 	return b
 }
 
-// Populate a new game board randomly, according to the `probAlive` setting.
+// Populate a new game board randomly according to the `probAlive` setting.
 func (b board) populateRandomly() {
 	rand.Seed(int64(os.Getpid()))
 	for i, row := range b {
@@ -106,7 +113,7 @@ func (b board) update() board {
 	return newBoard
 }
 
-// Returns the number of "alive" neighbors a given cell has.
+// Returns the number of living neighbors a given cell has.
 func (b board) countNeighbors(rNum int, cNum int) (count uint) {
 	for r := -1; r <= 1; r++ {
 		for c := -1; c <= 1; c++ {
@@ -132,7 +139,7 @@ func (b board) isAlive(rNum int, cNum int) bool {
 	return b[rNum][cNum]
 }
 
-// Given the state a cell and the number of living neighbors,
+// Given the state of a cell and the number of living neighbors,
 // return whether it survives the current round.
 func determineState(current bool, count uint) bool {
 	return (count == reproduceAt) || (current && count >= surviveMin && count <= surviveMax)
